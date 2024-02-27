@@ -40,10 +40,10 @@ class Tango:
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
         
-    def generate(self, prompt, steps=100, guidance=3, samples=1, disable_progress=True):
+    def generate(self, prompt, steps=100, guidance=3, samples=1, attention_weights=None, disable_progress=True):
         """ Genrate audio for a single prompt string. """
         with torch.no_grad():
-            latents = self.model.inference([prompt], self.scheduler, steps, guidance, samples, disable_progress=disable_progress)
+            latents = self.model.inference([prompt], self.scheduler, steps, guidance, samples, attention_weights=attention_weights, disable_progress=disable_progress)
             mel = self.vae.decode_first_stage(latents)
             wave = self.vae.decode_to_waveform(mel)
         return wave[0]

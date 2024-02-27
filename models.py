@@ -208,7 +208,7 @@ class AudioDiffusion(nn.Module):
         return loss
 
     @torch.no_grad()
-    def inference(self, prompt, inference_scheduler, num_steps=20, guidance_scale=3, num_samples_per_prompt=1, 
+    def inference(self, prompt, inference_scheduler, num_steps=20, guidance_scale=3, num_samples_per_prompt=1, attention_weights=None,
                   disable_progress=True):
         device = self.text_encoder.device
         classifier_free_guidance = guidance_scale > 1.0
@@ -237,7 +237,7 @@ class AudioDiffusion(nn.Module):
 
             noise_pred = self.unet(
                 latent_model_input, t, encoder_hidden_states=prompt_embeds,
-                encoder_attention_mask=boolean_prompt_mask
+                encoder_attention_mask=boolean_prompt_mask, attention_weights=attention_weights
             ).sample
 
             # perform guidance
