@@ -3,6 +3,7 @@ import random
 import inspect
 import numpy as np
 from tqdm import tqdm
+from stqdm import stqdm
 
 import torch
 import torch.nn as nn
@@ -96,7 +97,7 @@ class AudioDiffusion(nn.Module):
             self.tokenizer = CLIPTokenizer.from_pretrained(self.text_encoder_name, subfolder="tokenizer")
             self.text_encoder = CLIPTextModel.from_pretrained(self.text_encoder_name, subfolder="text_encoder")
         elif "t5" in self.text_encoder_name:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.text_encoder_name)
+            self.tokenizer = AutoTokenizer.from_pretrained(self.text_encoder_name, use_fast=True)
             self.text_encoder = T5EncoderModel.from_pretrained(self.text_encoder_name)
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(self.text_encoder_name)
@@ -228,7 +229,7 @@ class AudioDiffusion(nn.Module):
         latents = self.prepare_latents(batch_size, inference_scheduler, num_channels_latents, prompt_embeds.dtype, device)
 
         num_warmup_steps = len(timesteps) - num_steps * inference_scheduler.order
-        progress_bar = tqdm(range(num_steps), disable=disable_progress)
+        progress_bar = stqdm(range(num_steps), disable=disable_progress)
 
         for i, t in enumerate(timesteps):
             # expand the latents if we are doing classifier free guidance
